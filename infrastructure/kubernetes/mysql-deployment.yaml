@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None # Headless service for direct DB access.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate # Kills old pod before starting new one to safely swap the 'Hard Drive'.
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:8.0
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-db-password
+              key: password
+        - name: MYSQL_DATABASE
+          value: "raheem_db"
+        ports:
+        - containerPort: 3306
+          name: mysql
+        
+        # INTENT: Mapping the internal DB folder to our external 'Memory Card'
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql # This is the standard path where MySQL writes data.
+          
+      # INTENT: Defining the 'Plug' that connects to the PVC we created earlier
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pvc # This should match the name of the PVC we created in mysql-pvc.yaml

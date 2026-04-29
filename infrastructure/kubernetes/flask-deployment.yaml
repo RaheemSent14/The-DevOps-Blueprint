@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: flask
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      # DEVSECOPS: Security Context at the Pod level
+      securityContext:
+        runAsNonRoot: false 
+      containers:
+      - name: flask-app
+        # BRANDING: Your custom image
+        image: raheemsent14/raheem-app:v1.0.0 
+        imagePullPolicy: Always 
+        
+        # INTENT: Resource Quotas (The 'Gated Community' rules)
+        resources:
+          requests:
+            memory: "64Mi"   # Minimum guaranteed RAM
+            cpu: "100m"      # Minimum guaranteed CPU (10% of a core)
+          limits:
+            memory: "128Mi"  # Maximum RAM allowed before OOMKill
+            cpu: "500m"      # Maximum CPU allowed (50% of a core)
+
+        ports:
+        - containerPort: 5000
+        
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-service"
+        
+        # DEVSECOPS: Injecting the secret instead of plain text
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: flask-db-secret
+              key: mysql-password
+              
+        - name: MYSQL_USER
+          value: "root"
+        - name: MYSQL_DB
+          value: "raheem_db"
