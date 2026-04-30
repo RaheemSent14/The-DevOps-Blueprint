@@ -1,6 +1,44 @@
+# --- OS Specific ---
 .DS_Store
-__pycache__/
-*.pyc
+Thumbs.db
+*.swp
+
+# --- Terraform ---
+# Ignore the local provider plugins and metadata
 .terraform/
-.terraform/
+.terraform.lock.hcl
+
+# Ignore all state files (These contain sensitive plaintext data)
 *.tfstate
+*.tfstate.*
+terraform.tfstate*
+
+# Ignore variables that might contain secrets
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+
+# --- Python (Flask) ---
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+build/
+dist/
+*.egg-info/
+
+# --- Kubernetes & Docker ---
+# We keep manifests, but ignore local kubeconfig if copied here
+.kube/
+kubeconfig
+*.log
+
+# --- IDEs ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
