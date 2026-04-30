@@ -15,6 +15,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce # Only one Pod can write to this at a time to prevent data corruption.
+  storageClassName: ebs-sc # This should match the name of your StorageClass.
   resources:
     requests:
       storage: 1Gi    # Requesting 1 Gigabyte of storage.
